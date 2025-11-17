@@ -1,0 +1,6 @@
+Robert|Klitgaard|Controlling Corruption|/repo/Controlling Corruption|1988|El libro analiza causas y soluciones prácticas para reducir la corrupción.
+Hermes|Tovar Pinzón|Corrupción. Metáfora de ambición y deseo|/repo/Corrupción. Metáfora de ambición y deseo|2014|Describe una Colombia donde corrupción histórica moldea el poder y la sociedad.
+Susan|Rose-Ackerman|Corrupción y COVID-19|/repo/Corrupción y COVID-19|2021|La pandemia facilitó corrupción por urgencia, discrecionalidad y débil control.
+Luisa|Montuschi|La corrupción en la educación|/repo/La corrupción en la educación|2020|La corrupción educativa frena el desarrollo y limita acceso digno a educación.
+Liliana|Ruiz Acosta|Mecanismos para prevenir la corrupción:entre la normatividad y la efectividad|/repo/Mecanismos para prevenir la corrupción:entre la normatividad y la efectividad|2023|Las matrices de riesgo anticorrupción no cumplen su función según hallazgos.
+
