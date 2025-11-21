@@ -25,7 +25,7 @@ typedef int (*ComparadorTexto)(const Articulo*, const Articulo*);
 
 // Carga y muestra
 int cargarIndice(const char *nombreArchivo, Articulo lista[], int maxArticulos);
-void mostrarArticulos(Articulo lista[], int n);
+void mostrarArticulos(Articulo lista[], int n, int *listaApariciones);
 
 // utilidades
 void split(char *linea, char *campos[], int *numCampos, const char *sep);
@@ -44,10 +44,14 @@ void construirHeapTexto(Articulo arr[], int n, ComparadorTexto cmp);
 // heaps numéricos
 void heapifyNumerico(Articulo arr[], int n, int i);
 void construirHeapNumerico(Articulo arr[], int n);
+void heapifyNumericoApariciones(int apariciones[], Articulo lista[], int n, int i);
+void construirHeapApariciones(int apariciones[], Articulo lista[], int n);
 
 // ordenamientos
 void heapSortPorTitulo(Articulo arr[], int n);
 void heapSortPorTamTitulo(Articulo arr[], int n);
 void heapSortPorRuta(Articulo arr[], int n);
+int contarApariciones(const char *texto, const char *palabra);
+int* consultarPalabra(Articulo lista[], int cantidad);
 
 #endif

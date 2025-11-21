@@ -5,6 +5,13 @@
 #include "sisifo.h"
 
 void split(char *linea, char *campos[], int *numCampos, const char *sep) {
+	/**
+	 * Separa una línea en campos usando el separador dado con ayuda de strtok
+     * Dividiendo cada fragmento en tokens para almacenarlos en el arreglo campos
+     * const char para solo usar esa cadena como separador, no modificarla
+     * Modifica numCampos y llena campos con los tokens encontrados
+	 */
+
     char *token = strtok(linea, sep);
     int i = 0;
 
@@ -17,6 +24,13 @@ void split(char *linea, char *campos[], int *numCampos, const char *sep) {
 }
 
 int cargarIndice(const char *nombreArchivo, Articulo lista[], int maxArticulos) {
+    /**
+     * Carga los artículos desde un archivo de texto
+     * Cada linea del archivo representa un artículo con campos separados por |
+     * Llena el arreglo lista con los articulos cargados
+     * Retorna la cantidad de artículos cargados
+    */
+
     FILE *f = fopen(nombreArchivo, "r");
     if (!f) {
         printf("Error: no se pudo abrir el archivo %s\n", nombreArchivo);
@@ -53,35 +67,54 @@ int cargarIndice(const char *nombreArchivo, Articulo lista[], int maxArticulos) 
     return cantidad;
 }
 
-void mostrarArticulos(Articulo lista[], int n) {
+void mostrarArticulos(Articulo lista[], int n, int *listaApariciones) {
+    // Recorrer y printear los artiuclos
+
+    printf("\n=========== RESULTADOS ===========\n");
     for (int i = 0; i < n; i++) {
-        printf("\n---- Artículo %d ----\n", i+1);
+        printf("\n--- Artículo %d ---\n", i+1);
         printf("Título: %s\n", lista[i].titulo);
-        printf("Autor: %s %s\n", lista[i].autorNombre, lista[i].autorApellido);
-        printf("Año: %d\n", lista[i].anio);
-        printf("Ruta: %s\n", lista[i].ruta);
         printf("Resumen: %s\n", lista[i].resumen);
+        printf("Ruta: %s\n", lista[i].ruta);
+
+        if (listaApariciones != NULL) {
+            printf("Apariciones: %d\n", listaApariciones[i]);
+        }
     }
+    printf("\n==================================\n");
 }
+
 //-------------------------HEAP TEXTUAL-------------------------
 void heapifyTexto(Articulo arr[], int n, int i, ComparadorTexto cmp) {
-    int mayor = i;          
-    int izq = 2 * i + 1;    
-    int der = 2 * i + 2;    
+    /**
+     * Funcion heap maximo para comparadores de texto
+     * compara un nodo con sus dos hijos
+     * Elige el mas grande (segun el comparador de texto que se pase)
+     * Si el padre no era el mas grande
+     * lo intercambia con el hijo mas grande y repite el proceso recursivamente
+    */
 
+    int mayor = i;          // indice del mayor
+    int izq = 2 * i + 1;    // hijo izquierdo
+    int der = 2 * i + 2;    // hijo derecho
+
+    // si hijo izquierdo existe y su año es mayor
     if (izq < n && cmp(&arr[izq], &arr[mayor]) > 0) {
         mayor = izq;
     }
 
+    // si hijo derecho existe y su año es mayor
     if (der < n && cmp(&arr[der], &arr[mayor]) > 0) {
         mayor = der;
     }
 
+    // si el mayor no es la raiz
     if (mayor != i) {
         intercambiar(&arr[i], &arr[mayor]);
         heapifyTexto(arr, n, mayor, cmp);
     }
 }
+
 void construirHeapTexto(Articulo arr[], int n, ComparadorTexto cmp) {
     // se commienza desde el ultimo nodo
     for (int i = n/2 - 1; i >= 0; i--) {
@@ -90,7 +123,14 @@ void construirHeapTexto(Articulo arr[], int n, ComparadorTexto cmp) {
 }
 
 //-------------------------HEAP NUMERICO-------------------------
-
+    /**
+     * Funcion heap maximo numerico
+     * compara un nodo con sus dos hijos
+     * Elige el mas grande (segun el comparador de texto que se pase)
+     * Si el padre no era el mas grande
+     * lo intercambia con el hijo mas grande y repite el proceso recursivamente
+     * misma idea que el textual pero con numeros
+    */
 
 void heapifyNumerico(Articulo arr[], int n, int i) {
     int mayor = i;          // indice del mayor
@@ -114,14 +154,53 @@ void heapifyNumerico(Articulo arr[], int n, int i) {
     }
 }
 
+
+
 void construirHeapNumerico(Articulo arr[], int n) {
-    // desde el ultimo nodo interno hacia la raíz
+    // Desde el ultimo nodo interno hacia la raíz
     for (int i = n / 2 - 1; i >= 0; i--) {
         heapifyNumerico(arr, n, i);
     }
 }
 
 
+
+void heapifyNumericoApariciones(int apariciones[], Articulo lista[], int n, int i) {
+    /** 
+    * la diferencia de este con la funcion anterior es que esta ordena un arreglo de enteros
+    * que representan las apariciones de una palabra en los articulos, era necesario otra mas
+    * para mantener la alineacion entre ambos arreglos y no hacerlo mas complicado
+    */
+    int mayor = i;          // indice del mayor
+    int izq = 2 * i + 1;    // hijo izquierdo
+    int der = 2 * i + 2;    // hijo derecho
+
+    if (izq < n && apariciones[izq] > apariciones[mayor]) {
+        mayor = izq;
+    }
+    
+    if (der < n && apariciones[der] > apariciones[mayor]) {
+        mayor = der;
+    }
+
+    // si el mayor no es la raiz
+    if (mayor != i) {
+        // intercambia apariciones para mantener alineacion con los articulos
+        int temp = apariciones[i];
+        apariciones[i] = apariciones[mayor];
+        apariciones[mayor] = temp;
+
+        // intercambiar articulos         
+        intercambiar(&lista[i], &lista[mayor]);
+        heapifyNumericoApariciones(apariciones, lista, n, mayor);
+    }
+}
+
+void construirHeapApariciones(int apariciones[], Articulo lista[], int n) {
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapifyNumericoApariciones(apariciones, lista, n, i);
+    }
+}
 
 
 
@@ -191,8 +270,66 @@ void heapSortPorRuta(Articulo arr[], int n) {
     }
 }
 
+//------------------------ORDENAMIENTO 4(Apariciones de palabra)------------------------
 
+int contarApariciones(const char *texto, const char *palabra) {
+    /**
+     * Cuenta cuantas veces aparece una palabra en un texto
+     * busca ocurrencias de la palabra en el texto y las cuenta
+     * Retorna el num de apariciones encontradas
+    */
+    int contador = 0;
+    const char *p = texto;  // un puntero p que empieza al inicio del texto.
+    int len = strlen(palabra);
 
+    while ((p = strstr(p, palabra)) != NULL) {
+        contador++;
+        p += len; // avanzar el puntero
+    }
+
+    return contador;
+}
+
+int* consultarPalabra(Articulo lista[], int cantidad) {
+    /**
+     * Solicita al usuario una palabra
+     * cuenta cuantas veces aparece en cada artiuclo
+     * ordena los arrticulos según la cantidad de apariciones (de mayor a menor)
+     * retorna un arreglo con la cantidad de apariciones por articuo, unicamente
+     * para imprimir luego en mostrarArticulos
+    */
+
+    // Limpiar el buffer de entrada
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+	char* palabra = calloc(50, sizeof(char)); // Se reservan 50 bytes como maximo
+	printf("\nDigite la palabra que desea buscar: ");
+	fgets(palabra, 50, stdin);		// fgets(para variar con scanf), maximo 50 bytes acepta 
+	palabra[strcspn(palabra, "\n")] = '\0';
+	
+	// Buscar la palabra en cada archivo y ordenarlo segun cantidad de apariciones
+    int *listaApariciones = calloc(cantidad, sizeof(int));
+    for (int i = 0; i < cantidad; i++) {
+        listaApariciones[i] = contarApariciones(lista[i].titulo, palabra);
+    }
+    // Ordenar usando heap sort basado en listaApariciones
+    construirHeapApariciones(listaApariciones, lista, cantidad);
+    
+    for (int i = cantidad - 1; i > 0; i--) {
+        // intercambiar apariciones
+        int tmp = listaApariciones[0];
+        listaApariciones[0] = listaApariciones[i];
+        listaApariciones[i] = tmp;
+
+        // intercambiar artículos para mantener alineacion
+        intercambiar(&lista[0], &lista[i]);
+        heapifyNumericoApariciones(listaApariciones, lista, i, 0);
+    }
+    printf("\nArtículos ordenados por cantidad de apariciones de la palabra '%s':\n", palabra);
+    return listaApariciones;
+    free(listaApariciones);
+    free(palabra);
+}
 
 
 
@@ -200,12 +337,13 @@ void heapSortPorRuta(Articulo arr[], int n) {
 
 
 int main() {
+    // Se definen los articulos y se carga el indice de articulos cargados desde el archivo
     Articulo lista[MAX_ARTICULOS];
     int cantidad = cargarIndice(RUTA, lista, MAX_ARTICULOS);
 
     int opcion;
     int mostrar;
-
+    int *listaApariciones = NULL;   
     if (cantidad == 0) {
         printf("No se cargaron artículos.\n");
         return 0;
@@ -218,7 +356,7 @@ int main() {
         printf("1. Ordenar por TÍTULO\n");
         printf("2. Ordenar por TAMAÑO DEL TÍTULO\n");
         printf("3. Ordenar por NOMBRE DE ARCHIVO\n");
-        printf("4.  Ordenar por (custom falta)\n");
+        printf("4. Ordenar por PALABRA\n");
         printf("5. SALIR\n");
         printf("===========================================\n");
         printf("Seleccione una opción: ");
@@ -227,22 +365,26 @@ int main() {
 
         switch(opcion) {
             case 1:
+                // Ordenar por título
                 heapSortPorTitulo(lista, cantidad);
                 printf("\nArtículos ordenados por TÍTULO:\n");
                 break;
 
             case 2:
+                // Ordenar por tamaño del título
                 heapSortPorTamTitulo(lista, cantidad);
                 printf("\nArtículos ordenados por CANTIDAD DE PALABRAS del título:\n");
                 break;
 
             case 3:
+                // Ordenar por nombre de archivo
                 heapSortPorRuta(lista, cantidad);
                 printf("\nArtículos ordenados por NOMBRE DE ARCHIVO:\n");
                 break;
 
             case 4:
-                //TODO hacer el ultimo ordenamiento
+                // Ordenar por palabra
+				listaApariciones = consultarPalabra(lista, cantidad);
                 break;
 
             case 5:
@@ -253,22 +395,16 @@ int main() {
                 printf("\nOpción no válida. Intente de nuevo.\n");
                 continue;
         }
-
-        if (opcion >= 1 && opcion <= 4) {
+        // Mostrar artículos si la opción es válida
+        if (opcion >= 1 && opcion <= 4) { 
             printf("\n¿Cuántos artículos desea mostrar? (1 - %d): ", cantidad);
-            scanf("%d", &mostrar);
-
-            if (mostrar < 1) mostrar = 1;
-            if (mostrar > cantidad) mostrar = cantidad;
-
-            printf("\n=========== RESULTADOS ===========\n");
-            for (int i = 0; i < mostrar; i++) {
-                printf("\n--- Artículo %d ---\n", i+1);
-                printf("Título: %s\n", lista[i].titulo);
-                printf("Resumen: %s\n", lista[i].resumen);
-                printf("Ruta: %s\n", lista[i].ruta);
-            }
-            printf("\n==================================\n");
+            while (scanf("%d", &mostrar) != 1) {
+				printf("\nError, escribe un valor válido por favor (1-5)\n");
+				scanf("%*s");
+			}
+			if (mostrar >= 1 && mostrar <= cantidad) {            
+				mostrarArticulos(lista, mostrar, listaApariciones);
+			}
         }
 
     } while(opcion != 5);
