@@ -98,20 +98,31 @@ static const char *basename_from_path(const char *path) {
  */
 
 void mostrarArticulos(Articulo lista[], int n, int *listaApariciones) {
+    printf("\033[1;36m\n====================================\n");
+    printf("           RESULTADOS\n");
+    printf("====================================\033[0m\n");
 
-    printf("\n=========== RESULTADOS ===========\n");
     for (int i = 0; i < n; i++) {
-        printf("\n--- Artículo %d ---\n", i+1);
-        printf("Título: %s\n", lista[i].titulo);
-        printf("Resumen: %s\n", lista[i].resumen);
-        printf("Ruta: %s\n", lista[i].ruta);
+
+        printf("\033[1;33m\n┌───────────────────────────────────┐\n");
+        printf("│   Artículo %d\n", i + 1);
+        printf("└───────────────────────────────────┘\033[0m\n");
+
+        printf("\033[1;32mTítulo:      \033[0m%s\n", lista[i].titulo);
+        printf("\033[1;32mResumen:     \033[0m%s\n", lista[i].resumen);
+        printf("\033[1;32mRuta:        \033[0m%s\n", lista[i].ruta);
 
         if (listaApariciones != NULL) {
-            printf("Apariciones: %d\n", listaApariciones[i]);
+            printf("\033[1;32mApariciones: \033[0m%d\n", listaApariciones[i]);
         }
     }
-    printf("\n==================================\n");
+
+    printf("\033[1;36m\n====================================\n");
+    printf("              FIN\n");
+    printf("====================================\033[0m\n");
 }
+
+
 
 //-------------------------HEAP TEXTUAL-------------------------
 /**
